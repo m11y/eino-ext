@@ -657,6 +657,7 @@ func (c *Client) genRequest(ctx context.Context, in []*schema.Message, opts ...m
 				Function: &openai.FunctionDefinition{
 					Name:        t.Function.Name,
 					Description: t.Function.Description,
+					Strict:      dereferenceOrZero(t.Function.Strict),
 					Parameters:  t.Function.Parameters,
 				},
 			}
@@ -1291,13 +1292,15 @@ func toTools(tis []*schema.ToolInfo) ([]tool, error) {
 
 		sortArrayFields(paramsJSONSchema)
 
-		tools[i] = tool{
-			Function: &functionDefinition{
-				Name:        ti.Name,
-				Description: ti.Desc,
-				Parameters:  paramsJSONSchema,
-			},
+		fd := &functionDefinition{
+			Name:        ti.Name,
+			Description: ti.Desc,
+			Parameters:  paramsJSONSchema,
 		}
+		if strict, ok := ti.Extra["strict"].(bool); ok && strict {
+			fd.Strict = &strict
+		}
+		tools[i] = tool{Function: fd}
 	}
 
 	return tools, nil
