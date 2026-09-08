@@ -33,9 +33,8 @@ import (
 
 // Exercise the real SDK decoder and Responses converter together. Mocking
 // Stream.Next would hide comment-only blocks being decoded as empty JSON.
-// openai-go v3.43.0 is the first release with the no-data dispatch fix
-// (openai/openai-go#621); retaining the adapter's Go 1.22 baseline requires
-// no additional dependency upgrades for this fix.
+// Keep this regression when upgrading openai-go: the adapter must inherit
+// the SDK's no-data dispatch fix (openai/openai-go#621).
 func TestResponsesStreamIgnoresNoDataBlocks(t *testing.T) {
 	for name, keepAlive := range map[string]string{
 		"comment":  ": keep-alive\n\n",
